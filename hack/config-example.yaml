@@ -1,0 +1,13 @@
+# CLI tool, only in development environment.
+# https://goframe.org/pages/viewpage.action?pageId=3673173
+gfcli:
+  gen:
+    dao:
+      - link: "pgsql:你的pgsql账号:你的pgsql账号密码@tcp(你的pgsql数据库ip:你的pgsql数据库端口)/你的数据库名称"
+        tables: ""
+        path: "./internal"
+        jsonCase: "CamelLower"
+        daoPath: "/dao"
+        doPath: "/model/do"
+        entityPath: "/model/entity"
+        group: "default"
