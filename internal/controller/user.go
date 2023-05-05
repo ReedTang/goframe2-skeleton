@@ -2,6 +2,7 @@ package controller
 
 import (
 	"context"
+	"goframe2-skeleton/internal/logic/bizctx"
 
 	"goframe2-skeleton/api/v1"
 	"goframe2-skeleton/internal/service"
@@ -14,7 +15,7 @@ type cUser struct{}
 
 // Info 获取用户信息
 func (c *cUser) Info(ctx context.Context, req *user.GetUserInfoReq) (res *user.GetUserInfoRes, err error) {
-	res, err = service.User().GetInfo(ctx, req)
+	res, err = service.User().GetInfo(ctx, bizctx.New().UserId(ctx))
 	if err != nil {
 		return
 	}

@@ -48,7 +48,6 @@ type AddInviterCode struct {
 // GetUserInfoReq 获取用户信息
 type GetUserInfoReq struct {
 	g.Meta `path:"/user/info" method:"get" summary:"获取用户信息" tags:"用户" security:"BearerToken"`
-	UserId string `json:"userId" v:"required#请输入用户ID" dc:"用户ID"`
 }
 
 // GetUserInfoRes 获取用户信息

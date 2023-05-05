@@ -76,10 +76,10 @@ func (s *sUser) UserInfoPublic(ctx context.Context, userId int) (data *user.GetU
 	return
 }
 
-func (s *sUser) GetInfo(ctx context.Context, req *user.GetUserInfoReq) (data *user.GetUserInfoRes, err error) {
+func (s *sUser) GetInfo(ctx context.Context, userId int) (data *user.GetUserInfoRes, err error) {
 	var aiUser *entity.AiUser
 	m := dao.AiUser.Ctx(ctx)
-	err = m.Where("id", req.UserId).Scan(&aiUser)
+	err = m.Where("id", userId).Scan(&aiUser)
 	data = &user.GetUserInfoRes{
 		Id:        aiUser.Id,
 		UserName:  aiUser.UserName,

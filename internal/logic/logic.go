@@ -5,6 +5,7 @@
 package logic
 
 import (
+	_ "goframe2-skeleton/internal/logic/bizctx"
 	_ "goframe2-skeleton/internal/logic/middleware"
 	_ "goframe2-skeleton/internal/logic/user"
 )

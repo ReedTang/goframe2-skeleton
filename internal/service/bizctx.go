@@ -6,8 +6,8 @@
 package service
 
 import (
-	"goframe2-skeleton/internal/model"
 	"context"
+	"goframe2-skeleton/internal/model"
 
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/net/ghttp"
@@ -20,7 +20,7 @@ type (
 		SetUser(ctx context.Context, ctxUser *model.ContextUser)
 		SetData(ctx context.Context, data g.Map)
 		UserId(ctx context.Context) int
-		StationId(ctx context.Context) int
+		UserCode(ctx context.Context) string
 	}
 )
 

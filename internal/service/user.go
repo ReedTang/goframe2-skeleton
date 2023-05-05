@@ -15,7 +15,7 @@ type (
 	IUser interface {
 		Login(ctx context.Context, req *user.LoginDoReq) (user *entity.AiUser, err error)
 		UserInfoPublic(ctx context.Context, userId int) (data *user.GetUserInfoRes, err error)
-		GetInfo(ctx context.Context, req *user.GetUserInfoReq) (data *user.GetUserInfoRes, err error)
+		GetInfo(ctx context.Context, userId int) (data *user.GetUserInfoRes, err error)
 	}
 )
 
