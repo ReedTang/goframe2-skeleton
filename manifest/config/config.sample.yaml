@@ -1,0 +1,85 @@
+env: "dev"
+debug: true
+server:
+  domain: "http://127.0.0.1:8888"
+  address:     ":8888"
+  openapiPath: "/api.json"
+  swaggerPath: "/swagger"
+  dumpRouterMap: false
+  maxHeaderBytes: "20KB"
+  clientMaxBodySize: "50MB"
+  serverRoot: "./resource/public"
+  # Logging配置
+  logPath: "./resource/log/server"                 # 日志文件存储目录路径，建议使用绝对路径。默认为空，表示关闭
+  logStdout: true               # 日志是否输出到终端。默认为true
+  errorStack: true               # 当Server捕获到异常时是否记录堆栈信息到日志中。默认为true
+  errorLogEnabled: true               # 是否记录异常日志信息到日志中。默认为true
+  errorLogPattern: "error-{Ymd}.log"  # 异常错误日志文件格式。默认为"error-{Ymd}.log"
+  accessLogEnabled: true              # 是否记录访问日志。默认为false
+  accessLogPattern: "access-{Ymd}.log" # 访问日志文件格式。默认为"access-{Ymd}.log"
+
+logger:
+  path: "./resource/log/run"
+  file: "{Y-m-d}.log"
+  level: "all"
+  stdout: true
+
+
+# Database.
+database:
+  logger:
+    level: "all"
+    stdout: true
+    path: "./resource/log/sql"
+  default:
+    debug: true
+    type: "pgsql"
+    ink: "pgsql:你的pgsql账号:你的pgsql账号密码@tcp(你的pgsql数据库ip:你的pgsql数据库端口)/你的数据库名称"
+    dryRun: false # 空跑特性 - 不执行任何数据库操作，仅打印SQL语句
+    charset: "utf8"
+    prefix: ""
+
+# Redis 配置示例
+redis:
+  # 单实例配置
+  default:
+    address: "127.0.0.1:6379"
+    db: 1
+    pass: ""                                    # 队列超时时间以秒为单位，0表示永不超时。如果队列在设定的超时时间内没有被消费，则会被销毁
+
+# 缓存配置
+cache:
+  prefix: "dt_"
+  useRedis: true
+  adapter: "redis"                    # 缓存驱动方式，支持：memory|redis|file，不填默认memory
+  fileDir: "./storage/cache"         # 文件缓存路径，adapter=file时必填
+
+# 登录令牌
+token:
+  secretKey: "goFrame"               # 令牌加密秘钥，考虑安全问题生产环境中请修改默认值
+  expires: 604800                        # 令牌有效期，单位：秒。默认7天
+  autoRefresh: true                      # 是否开启自动刷新过期时间， false|true 默认为true
+  refreshInterval: 86400                 # 刷新间隔，单位：秒。必须小于expires，否则无法触发。默认1天内只允许刷新一次
+  maxRefreshTimes: 30                    # 最大允许刷新次数，-1不限制。默认30次
+  multiLogin: true                       # 是否允许多端登录， false|true 默认为true
+
+# 路由配置
+router:
+  # 接口
+  api:
+    # 不需要验证登录的路由地址
+    exceptLogin: [
+      "/auth/login",              # 登录
+    ]
+    # 不需要验证权限的路由地址
+    exceptAuth: [
+    ]
+
+# 系统
+system:
+  notCheckAuthAdminIds: [1] # 不检查权限的管理员ID，超级管理员
+  excludePaths: # 不检查权限的路径
+    - "/user/login"
+
+upload:
+  type: aliyun

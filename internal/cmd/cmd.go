@@ -1,104 +1,53 @@
 package cmd
 
 import (
-	"github.com/gogf/gf/v2/frame/g"
-	"github.com/gogf/gf/v2/net/ghttp"
-	"github.com/gogf/gf/v2/net/goai"
-	"github.com/gogf/gf/v2/os/glog"
-	"github.com/gogf/gf/v2/os/gtime"
+	"context"
 
-	"goframe2-skeleton/internal/router"
-	"goframe2-skeleton/utility/response"
+	_ "goframe2-skeleton/pkg/redis"
+	"goframe2-skeleton/pkg/simple"
+
+	"github.com/gogf/gf/v2/frame/g"
+	"github.com/gogf/gf/v2/os/gcmd"
+	"github.com/gogf/gf/v2/os/gtime"
 )
 
-func ServerBoot() {
-	s := g.Server()
-	err := gtime.SetTimeZone("Asia/Shanghai")
-	if err != nil {
-		return
-	}
-	g.Log().SetFlags(glog.F_ASYNC | glog.F_TIME_DATE | glog.F_TIME_TIME | glog.F_FILE_LONG)
-	s.Group("/", func(group *ghttp.RouterGroup) {
-		group.GET("/swagger-ui", func(r *ghttp.Request) {
-			r.Response.Write(renderSwaggerUIPageContent())
-		})
-		router.InitRoutes(group)
-	})
-	// 自定义丰富文档
-	enhanceOpenAPIDoc(s)
-	s.EnableAdmin()
-	s.Run()
-}
-
-func enhanceOpenAPIDoc(s *ghttp.Server) {
-	openapi := s.GetOpenApi()
-	openapi.Config.CommonResponse = response.JsonRes{}
-	openapi.Config.CommonResponseDataField = `Data`
-	openapi.Components = goai.Components{
-		SecuritySchemes: goai.SecuritySchemes{
-			"BearerToken": goai.SecuritySchemeRef{
-				Ref: "",
-				Value: &goai.SecurityScheme{
-					// 此处type是openApi的规定，详见 https://swagger.io/docs/specification/authentication/api-keys/
-					Type:         "http",
-					In:           "header",
-					Scheme:       "bearer",
-					BearerFormat: "JWT",
-				},
-			},
+var (
+	Main = &gcmd.Command{
+		Description: "默认启动全部服务",
+		Func: func(ctx context.Context, parser *gcmd.Parser) (err error) {
+			return All.Func(ctx, parser)
 		},
 	}
-	var servers goai.Servers
-	servers = append(servers, goai.Server{
-		URL:         "http://127.0.0.1:8000/",
-		Description: "本地开发环境",
-	})
-	servers = append(servers, goai.Server{
-		URL:         "https://api.****.com/",
-		Description: "正式环境",
-	})
-	openapi.Servers = &servers
 
-	// API description.
-	openapi.Info.Title = `goFrame2-skeleton`
-	openapi.Info.Description = `goFrame2-skeleton接口`
+	All = &gcmd.Command{
+		Name:        "all",
+		Brief:       "start all server",
+		Description: "this is the command entry for starting all server",
+		Func: func(ctx context.Context, parser *gcmd.Parser) (err error) {
+			g.Log().Debug(ctx, "starting all server")
+			// 需要启动的服务
+			_ = gtime.SetTimeZone("Asia/Shanghai")
+			allServers := []*gcmd.Command{Http}
+			for _, server := range allServers {
+				cmd := server
+				simple.SafeGo(ctx, func(ctx context.Context) {
+					if err := cmd.Func(ctx, parser); err != nil {
+						g.Log().Fatalf(ctx, "%v start fail:%v", cmd.Name, err)
+					}
+				})
+			}
+			// 信号监听
+			signalListen(ctx, signalHandlerForOverall)
+			<-serverCloseSignal
+			serverWg.Wait()
+			g.Log().Debug(ctx, "all service successfully closed ..")
+			return
+		},
+	}
+)
 
-}
-
-func renderSwaggerUIPageContent() (swaggerUIPageContent string) {
-	swaggerUIPageContent = `
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta
-      name="description"
-      content="SwaggerUI"
-    />
-    <title>SwaggerUI</title>
-    <link rel="stylesheet" href="https://cdn.staticfile.org/swagger-ui/4.15.5/swagger-ui.min.css" />
-  </head>
-  <body>
-  <div id="swagger-ui"></div>
-  <script src="https://cdn.staticfile.org/swagger-ui/4.15.5/swagger-ui-bundle.min.js" crossorigin></script>
-  <script src="https://cdn.staticfile.org/swagger-ui/4.15.5/swagger-ui-standalone-preset.min.js" crossorigin></script>
-  <script>
-    window.onload = () => {
-      window.ui = SwaggerUIBundle({
-        url: '/api.json',
-        dom_id: '#swagger-ui',
-        presets: [
-          SwaggerUIBundle.presets.apis,
-          SwaggerUIStandalonePreset
-        ],
-        layout: "StandaloneLayout",
-      });
-    };
-  </script>
-  </body>
-</html>
-`
-
-	return
+func init() {
+	if err := Main.AddCommand(All, Http); err != nil {
+		panic(err)
+	}
 }

@@ -3,6 +3,7 @@ package model
 import (
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/net/ghttp"
+	"github.com/gogf/gf/v2/os/gtime"
 )
 
 type Context struct {
@@ -12,6 +13,10 @@ type Context struct {
 }
 
 type ContextUser struct {
-	Id   int    `json:"id"`   // 用户id
-	Code string `json:"code"` // 邀请码
+	Id        int64       `json:"id"`        // 用户id
+	UserName  string      `json:"userName"`  // 用户名
+	Mobile    string      `json:"mobile"`    // 手机号
+	App       string      `json:"app"`       // 登录应用
+	LoginAt   *gtime.Time `json:"loginAt"`   // 登录时间
+	CreatedAt *gtime.Time `json:"createdAt"` // 创建时间
 }

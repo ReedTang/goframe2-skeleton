@@ -10,8 +10,6 @@ bin/
 **/.DS_Store
 main
 output/
-manifest/output/
-manifest/config/*
 resource/log/*
 hack/config.yaml
 temp/
